@@ -4,8 +4,12 @@ using UnityEngine.SceneManagement;
 
 public class EnemyMovement : MonoBehaviour
 {
+    [Header("Zombie Attack Time")]
+    public float attackTime = 2f;
+
     [Header("Zombie Footsteps")]
     public AudioSource footsteps;
+    public float footstepsSpeed = 1f;
 
     [Header("Zombie Moaning")]
     public AudioSource ZombieSoundsSource;
@@ -16,6 +20,7 @@ public class EnemyMovement : MonoBehaviour
     float stopTimer = 3f;
     float soundTimer = 10f;
     bool playerDead = false;
+    bool playerInRange = false;
 
     void Awake()
     {
@@ -28,11 +33,15 @@ public class EnemyMovement : MonoBehaviour
         {
             footsteps.clip = null;
         }
+        else
+        {
+            footsteps.pitch = footstepsSpeed;
+        }
     }
 
     void Update()
     {
-        if (stopTimer >= 3f && !playerDead)
+        if (stopTimer >= attackTime && !playerDead && !playerInRange)
         {
             nav.isStopped = false;
             nav.SetDestination(player.position);
@@ -66,7 +75,16 @@ public class EnemyMovement : MonoBehaviour
         if (collision.gameObject.tag == "Player")
         {
             nav.isStopped = true;
+            playerInRange = true;
             stopTimer = 0f;
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if(other.tag == "Player")
+        {
+            playerInRange = false;
         }
     }
 
@@ -101,5 +119,10 @@ public class EnemyMovement : MonoBehaviour
                 footstepPlaying = false;
             }
         }
+    }
+
+    public void ResetStopTimer()
+    {
+        stopTimer = 0f;
     }
 }

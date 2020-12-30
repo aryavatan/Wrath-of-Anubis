@@ -53,6 +53,8 @@ public class Shotgun : Gun
             }
         }
 
+        Camera.main.GetComponent<MilkShake.Shaker>().Shake(cameraShake);
+
         timer = 0f;
     }
 

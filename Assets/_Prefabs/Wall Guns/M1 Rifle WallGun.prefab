@@ -107,7 +107,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bfe76e8283896545a1e2570f5dbc5a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Gun: {fileID: 8231138434656489195, guid: 08a334116678da841885d6a7bfd30e13, type: 3}
+  gun: {fileID: 8231138434656489195, guid: 08a334116678da841885d6a7bfd30e13, type: 3}
   cost: 1000
   WeaponHolder: {fileID: 0}
   InsufficientFundsAudio: {fileID: 8300000, guid: 3ead180e42da4a842aca0698d21c39cb,

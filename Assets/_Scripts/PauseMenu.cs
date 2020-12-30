@@ -73,6 +73,7 @@ public class PauseMenu : MonoBehaviour
 
     public void ExitGame()
     {
+        Gun.ResetVariables();
         FindObjectOfType<WaveManager>().SaveGameStatistics();
         Time.timeScale = 1f;
         AudioListener.pause = false;
@@ -84,6 +85,7 @@ public class PauseMenu : MonoBehaviour
     {
         Time.timeScale = 1f;
         AudioListener.pause = false;
+        Gun.ResetVariables();
 
         StartCoroutine(LoadLevel(SceneManager.GetActiveScene().buildIndex));
     }
@@ -101,6 +103,8 @@ public class PauseMenu : MonoBehaviour
 
     [Header("Options Objects")]
     public TMP_Dropdown graphicsDropdown;
+    public TMP_Dropdown targetFpsDropdown;
+    public Toggle vsyncToggle;
     public Slider fovSlider;
     public TextMeshProUGUI fovText;
     public TextMeshProUGUI fovTextGameOver;
@@ -110,6 +114,10 @@ public class PauseMenu : MonoBehaviour
 
     void initOptions()
     {
+        // Init VSync Setting
+        int vsync = PlayerPrefs.GetInt("VSyncOption", 1);
+        ToggleVSync(vsync == 1 ? true : false);
+
         // Init Graphics
         int graphics = PlayerPrefs.GetInt("GraphicsOption", -1);
         if (graphics == -1)
@@ -137,12 +145,19 @@ public class PauseMenu : MonoBehaviour
             volume = 100;
         }
         OnVolumeChange(volume);
+
+        // Init Target FPS
+        int targetFPS = PlayerPrefs.GetInt("TargetFPS", 1);
+        OnTargetFpsChange(targetFPS);
     }
 
     public void OnGraphicsChange(int graphics)
     {
         // Set quality
         QualitySettings.SetQualityLevel(graphics);
+
+        // Make sure VSync is unchanged
+        ToggleVSync(vsyncToggle.isOn);
 
         // Update dropdown
         graphicsDropdown.value = graphics;
@@ -182,6 +197,52 @@ public class PauseMenu : MonoBehaviour
         // Save settings
         PlayerPrefs.SetInt("VolumeOption", (int)value);
         PlayerPrefs.Save();
+    }
+
+    public void OnTargetFpsChange(int option)
+    {
+        // Update dropdown
+        targetFpsDropdown.value = option;
+
+        // Save setting
+        PlayerPrefs.SetInt("TargetFPS", option);
+        PlayerPrefs.Save();
+
+        // Set Target FPS
+        switch (option)
+        {
+            case 0:
+                Application.targetFrameRate = 30;
+                break;
+            case 2:
+                Application.targetFrameRate = 120;
+                break;
+            case 3:
+                Application.targetFrameRate = -1;
+                break;
+            case 1:
+            default:
+                Application.targetFrameRate = 60;
+                break;
+        }
+    }
+
+    public void ToggleVSync(bool state)
+    {
+        // Update Checkbox
+        vsyncToggle.isOn = state;
+
+        // Save setting
+        PlayerPrefs.SetInt("VSyncOption", state ? 1 : 0);
+        PlayerPrefs.Save();
+
+        // Toggle VSync
+        QualitySettings.vSyncCount = state ? 1 : 0;
+
+        // Toggle Target FPS Dropdown
+        if (state)
+            OnTargetFpsChange(1);
+        targetFpsDropdown.interactable = !state;
     }
 
     #endregion

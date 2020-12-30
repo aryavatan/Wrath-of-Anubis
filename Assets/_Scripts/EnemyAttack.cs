@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyAttack : MonoBehaviour
@@ -9,15 +8,19 @@ public class EnemyAttack : MonoBehaviour
     public float hitDelay;
 
     Animator anim;
-    EnemyHealth health;
     float timer = 0f;
     bool playerInRange = false;
     bool dead = false;
+    EnemyMovement movementScript;
+
+    [Header("Debuffs On Attack")]
+    public bool slownessDebuff = false;
+    public float slownessDuration = 1f;
 
     void Awake()
     {
         anim = GetComponent<Animator>();
-        health = GetComponent<EnemyHealth>();
+        movementScript = GetComponent<EnemyMovement>();
     }
 
     void Update()
@@ -50,6 +53,7 @@ public class EnemyAttack : MonoBehaviour
     private void Attack(PlayerHealth player)
     {
         anim.SetTrigger("Attack");
+        movementScript.ResetStopTimer();
         StartCoroutine(DamagePlayer(player, hitDelay));
         timer = 0f;
     }
@@ -60,6 +64,11 @@ public class EnemyAttack : MonoBehaviour
         if (playerInRange && !dead)
         {
             player.TakeDamage(damage);
+            if (slownessDebuff)
+            {
+                player.GetComponent<PlayerMovement>().AddSlownessDebuff(slownessDuration);
+                FindObjectOfType<GameUI>().EnableSlownessDebuffUI(slownessDuration);
+            }
         }
     }
 

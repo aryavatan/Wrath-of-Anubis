@@ -5,7 +5,6 @@ public class PlayerStatistics
     public int highestRound = 0;
     public int highestKillsPerGame = 0;
     public int totalKills = 0;
-    public float endlessTime = 0f;
 
     public static PlayerStatistics Load()
     {

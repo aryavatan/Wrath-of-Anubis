@@ -5,7 +5,7 @@ using UnityEngine;
 public class WallGun : MonoBehaviour
 {
     [Header("Wall Gun Details")]
-    public GameObject Gun;
+    public GameObject gun;
     public int cost;
 
     [Header("Asset Dependencies")]
@@ -46,7 +46,7 @@ public class WallGun : MonoBehaviour
             bool playerHasThisGun = false;
             foreach (Transform playerGun in WeaponHolder.transform)
             {
-                if (playerGun.name.Contains(Gun.name))
+                if (playerGun.name.Contains(gun.name))
                 {
                     playerHasThisGun = true;
                     break;
@@ -71,7 +71,7 @@ public class WallGun : MonoBehaviour
         // Check if player already has this gun
         foreach (Transform playerGun in WeaponHolder.transform)
         {
-            if (playerGun.name.Contains(Gun.name))
+            if (playerGun.name.Contains(gun.name))
             {
                 // Check if weapon needs ammo
                 bool fullAmmo = playerGun.GetComponent<Gun>().IsAmmoFull();
@@ -98,12 +98,14 @@ public class WallGun : MonoBehaviour
         {
             moneySpentAudioSource.Play();
 
-            // If player only has one gun, add this gun as second gun
-            if (WeaponHolder.childCount < 2)
+            // If Player has empty holster space, add this gun to their inventory
+            if (WeaponHolder.childCount < Gun.HolsterCount)
             {
-                Gun currentGun = WeaponHolder.GetChild(0).GetComponent<Gun>();
-                Instantiate(Gun, WeaponHolder).SetActive(false);
-                currentGun.SwitchWeapon(true);
+                Gun currentGun = FindObjectOfType<Gun>();
+                Transform newGun = Instantiate(gun, WeaponHolder).transform;
+                newGun.gameObject.SetActive(false);
+
+                currentGun.SwitchWeapon(true, newGun.GetSiblingIndex());
 
                 // Update UI tooltip to show ammo cost
                 ui.SetWallgunTooltip(true, cost, true);
@@ -119,7 +121,7 @@ public class WallGun : MonoBehaviour
                             ui.CancelReloadUI();
 
                         Destroy(gunInInventory.gameObject);
-                        Instantiate(Gun, WeaponHolder);
+                        Instantiate(gun, WeaponHolder);
 
                         // Update UI tooltip to show ammo cost
                         ui.SetWallgunTooltip(true, cost, true);
@@ -127,6 +129,16 @@ public class WallGun : MonoBehaviour
                         break;
                     }
                 }
+
+                Gun currentGun = FindObjectOfType<Gun>();
+                if (currentGun.IsReloading())
+                    ui.CancelReloadUI();
+
+                Destroy(currentGun.gameObject);
+                Instantiate(gun, WeaponHolder);
+
+                // Update UI tooltip to show ammo cost
+                ui.SetWallgunTooltip(true, cost, true);
             }
         }
         else

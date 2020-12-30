@@ -1,6 +1,6 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityStandardAssets.ImageEffects;
 
 public class SniperScope : MonoBehaviour
 {
@@ -16,11 +16,16 @@ public class SniperScope : MonoBehaviour
     public float ScopeSwayMax = 1.5f;
     public float ScopeSwaySpeed = 0.1f; //speed of target sway
 
+    [Header("Optional")]
+    public Sprite customOverlay = null;
+
     static int defaultFov = 60;
     Camera weaponCamera;
     GameUI ui;
     PlayerMovement playerCamera;
     Gun gun;
+    ColorCorrectionCurves mainCameraEffect1;
+    Bloom mainCameraEffect2;
 
     bool isScoped = false;
 
@@ -39,6 +44,9 @@ public class SniperScope : MonoBehaviour
         defaultFov = PlayerPrefs.GetInt("FovOption", -1);
         if (defaultFov == -1)
             defaultFov = 60;
+
+        mainCameraEffect1 = Camera.main.GetComponent<ColorCorrectionCurves>();
+        mainCameraEffect2 = Camera.main.GetComponent<Bloom>();
     }
 
     //Update is called once per frame
@@ -61,11 +69,17 @@ public class SniperScope : MonoBehaviour
         
         if (isScoped)
         {
-            ui.SetSniperScope(true);
+            ui.SetSniperScope(true, customOverlay);
 
             weaponCamera.enabled = false;
             Camera.main.fieldOfView = scopeZoom;
 
+            // Toggle Color Correction and Bloom on main camera
+            if (mainCameraEffect1)
+                mainCameraEffect1.enabled = true;
+            if (mainCameraEffect2)
+                mainCameraEffect2.enabled = true;
+            
             playerCamera.SetCameraSensitivity(scopeSensitivity);
 
             SniperSway();
@@ -76,6 +90,13 @@ public class SniperScope : MonoBehaviour
     {
         isScoped = false;
         ui.SetSniperScope(false);
+
+        // Toggle Color Correction and Bloom on main camera
+        if (mainCameraEffect1)
+            mainCameraEffect1.enabled = false;
+        if (mainCameraEffect2)
+            mainCameraEffect2.enabled = false;
+
         weaponCamera.enabled = true;
         Camera.main.fieldOfView = defaultFov;
         playerCamera.SetCameraSensitivity(1f);

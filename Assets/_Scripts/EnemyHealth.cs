@@ -8,7 +8,9 @@ public class EnemyHealth : MonoBehaviour
     public int pointsOnDeath = 50;
     public float despawnTime = 10f;
     public AudioSource damageAudioSource;
-    public AudioClip hurtSound;
+
+    // Taken off in 1.0 update 
+    //public AudioClip hurtSound;
 
     public bool isDead = false;
 
@@ -24,7 +26,9 @@ public class EnemyHealth : MonoBehaviour
         health -= damage;
         if (!isDead)
         {
-            damageAudioSource.PlayOneShot(hurtSound);
+            // Taken off in 1.0 update 
+            //damageAudioSource.PlayOneShot(hurtSound);
+
             if (health <= 0)
             {
                 isDead = true;

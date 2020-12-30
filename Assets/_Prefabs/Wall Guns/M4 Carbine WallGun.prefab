@@ -93,8 +93,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1.3319622, y: 0.19687863, z: 0.5207172}
-  m_Center: {x: -0.24462163, y: 0.025244389, z: 0.20430702}
+  m_Size: {x: 1.0172687, y: 0.19687863, z: 0.5207172}
+  m_Center: {x: -0.13749689, y: 0.025244392, z: 0.20430702}
 --- !u!114 &4324226766143420198
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -107,8 +107,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bfe76e8283896545a1e2570f5dbc5a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Gun: {fileID: 4591682776495956963, guid: 24d6208aef69b20428fc1f31077b6b7b, type: 3}
-  cost: 2000
+  gun: {fileID: 4591682776495956963, guid: 24d6208aef69b20428fc1f31077b6b7b, type: 3}
+  cost: 4000
   WeaponHolder: {fileID: 0}
   InsufficientFundsAudio: {fileID: 8300000, guid: 3ead180e42da4a842aca0698d21c39cb,
     type: 3}

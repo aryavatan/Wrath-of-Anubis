@@ -54,6 +54,12 @@ public class PlayerMovement : MonoBehaviour
     // Default FOV
     private static int fov = 60;
 
+    // Debuff Variables
+    bool debuffActive = false;
+    float debuffTimer = 0f;
+    float debuffDuration = 0f;
+    float debuffMultiplier = 1f;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -91,6 +97,17 @@ public class PlayerMovement : MonoBehaviour
             return;
         MyInput();
         Look();
+
+        debuffTimer += Time.deltaTime;
+        if (debuffActive)
+        {
+            debuffMultiplier = 0.4f;
+        }
+        if (debuffTimer > debuffDuration)
+        {
+            debuffMultiplier = 1f;
+            debuffActive = false;
+        }
     }
 
     /// <summary>
@@ -152,7 +169,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         //Set max speed
-        float maxSpeed = this.maxSpeed * movementMultiplier;
+        float maxSpeed = this.maxSpeed * movementMultiplier * debuffMultiplier;
 
         //If sliding down a ramp, add force down so player stays grounded and also builds speed
         if (crouching && grounded && readyToJump)
@@ -397,6 +414,13 @@ public class PlayerMovement : MonoBehaviour
                 footstepPlaying = false;
             }
         }
+    }
+
+    public void AddSlownessDebuff(float duration)
+    {
+        debuffDuration = duration;
+        debuffTimer = 0f;
+        debuffActive = true;
     }
 
 }

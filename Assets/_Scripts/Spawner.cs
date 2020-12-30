@@ -1,52 +1,59 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.AI;
 
 public class Spawner : MonoBehaviour
 {
-    public GameObject zombie;
-    public float spawnRate = 2f;
-    float timer;
+    [Header("Gate Restriction")]
+    public bool hasGateRestriction;
+    public Gate gate;
 
-    bool spawnerOn = false;
-    public int spawnCount;
-    float enemyHealthMultiplier;
-    float enemyDamageMultiplier;
+    bool playerNearby = false;
 
-    // Update is called once per frame
-    void Update()
+    /// <summary>
+    /// Returns true if this spawner is available to start spawning from
+    /// </summary>
+    public bool IsAvailable()
     {
-        if (spawnerOn)
+        if (hasGateRestriction)
         {
-            timer += Time.deltaTime;
+            return (gate.IsOpen() && !playerNearby);
+        }
 
-            if (timer > spawnRate && spawnCount > 0)
-            {
-                // Spawn enemy
-                GameObject spawn = Instantiate(zombie, transform.position, transform.rotation);
+        return !playerNearby;
+    }
 
-                // Adjust difficulty
-                spawn.GetComponent<EnemyHealth>().health *= enemyHealthMultiplier;
-                spawn.GetComponent<EnemyAttack>().damage *= enemyDamageMultiplier;
+    /// <summary>
+    /// Will spawn an enemy at this spawn point
+    /// </summary>
+    /// <param name="enemy">Prefab of the enemy type to be spawned</param>
+    /// <param name="healthMultiplier">Optional multiplier for the health of the enemy</param>
+    /// <param name="damageMultiplier">Optional multiplier for the damage of the enemy</param>
+    public void Spawn(GameObject enemy, float healthMultiplier = 1f, float damageMultiplier = 1f, float speedIncrease = 0f)
+    {
+        GameObject spawnedEnemy = Instantiate(enemy, transform.position, transform.rotation);
+        spawnedEnemy.GetComponent<EnemyHealth>().health *= healthMultiplier;
+        spawnedEnemy.GetComponent<EnemyAttack>().damage *= damageMultiplier;
 
-                // Turn off spawner when the quota of zombies spawned has been met
-                if (--spawnCount == 0)
-                {
-                    spawnerOn = false;
-                }
-                
-                timer = 0f;
-            }
+        if (speedIncrease != 0f)
+        {
+            spawnedEnemy.GetComponent<NavMeshAgent>().speed += speedIncrease;
         }
     }
 
-    public void StartWave(int spawnCount, float enemyHealthMultiplier, float enemyDamageMultiplier)
+    private void OnTriggerEnter(Collider other)
     {
-        this.spawnCount = spawnCount;
-        this.enemyHealthMultiplier = enemyHealthMultiplier;
-        this.enemyDamageMultiplier = enemyDamageMultiplier;
-
-        spawnerOn = true;
-        timer = 0f;
+        if (other.CompareTag("Player"))
+        {
+            playerNearby = true;
+        }
     }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            playerNearby = false;
+        }
+    }
+
 }

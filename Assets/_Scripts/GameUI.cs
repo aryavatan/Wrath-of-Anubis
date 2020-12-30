@@ -14,6 +14,10 @@ public class GameUI : MonoBehaviour
     public TextMeshProUGUI moneyCounter;
     public GameObject reloadTooltip;
     public GameObject wallGunTooltip;
+    public GameObject gateTooltip;
+    public GameObject perkTooltip;
+    public Image slownessDebuffProgress;
+    public GameObject[] perks;
     public Image sniperScope;
 
     [Header("Game Over Panel")]
@@ -23,6 +27,10 @@ public class GameUI : MonoBehaviour
     float reloadTime;
     float time;
     bool forceCrosshairOff = false;
+
+    // Debuff Variables
+    float debuffDuration = 0f;
+    float debuffTimer = 0f;
 
     // Update is called once per frame
     void Update()
@@ -40,7 +48,25 @@ public class GameUI : MonoBehaviour
             forceCrosshairOff = false;
         }
 
+        if (debuffTimer < debuffDuration)
+        {
+            debuffTimer += Time.deltaTime;
+            slownessDebuffProgress.fillAmount = 1 - (debuffTimer / debuffDuration);
+        }
+        else
+        {
+            slownessDebuffProgress.fillAmount = 0;
+            slownessDebuffProgress.gameObject.SetActive(false);
+        }
+
         crosshair.SetActive(forceCrosshairOff ? false : !(Input.GetButton("Fire2")));
+    }
+
+    public void EnableSlownessDebuffUI(float duration)
+    {
+        debuffDuration = duration;
+        debuffTimer = 0f;
+        slownessDebuffProgress.gameObject.SetActive(true);
     }
 
     public void SetCrosshairSize(int size)
@@ -48,14 +74,21 @@ public class GameUI : MonoBehaviour
         crosshair.GetComponent<RectTransform>().sizeDelta = new Vector2(size, size);
     }
 
-    public void Reload(float reloadTime, int clip, int ammoInventory)
+    public void Reload(float reloadTime, int clip, int ammoInventory, int clipSize)
     {
         this.reloadTime = reloadTime;
         time = 0f;
         crosshair.SetActive(false);
 
-        string ammo = string.Format("{0}/{1}", clip, ammoInventory);
-        StartCoroutine(ReloadAmmoCounter(ammo, reloadTime));
+        StartCoroutine(ReloadAmmoCounter(reloadTime, clip,  ammoInventory,  clipSize));
+    }
+
+    private bool cancelReload = false;
+    public void CancelReload()
+    {
+        cancelReload = true;
+        CancelReloadUI();
+        crosshair.SetActive(true);
     }
 
     public void UpdateAmmoCounter(string ammo)
@@ -63,10 +96,33 @@ public class GameUI : MonoBehaviour
         AmmoCounter.text = ammo;
     }
 
-    IEnumerator ReloadAmmoCounter(string text, float delay)
+    IEnumerator ReloadAmmoCounter(float delay, int ammoInClip, int ammoInInventory, int clipSize)
     {
         yield return new WaitForSeconds(delay);
-        UpdateAmmoCounter(text);
+
+        if (!cancelReload)
+        {
+            ammoInInventory += ammoInClip;
+            ammoInClip = 0;
+
+            if (ammoInInventory >= clipSize)
+            {
+                ammoInInventory -= clipSize;
+                ammoInClip = clipSize;
+            }
+            else
+            {
+                ammoInClip = ammoInInventory;
+                ammoInInventory = 0;
+            }
+            
+            string ammoText = string.Format("{0}/{1}", ammoInClip, ammoInInventory);
+            UpdateAmmoCounter(ammoText);
+        }
+        else
+        {
+            cancelReload = false;
+        }
     }
 
     public void CancelReloadUI()
@@ -95,9 +151,11 @@ public class GameUI : MonoBehaviour
         return true;
     }
 
-    public void SetSniperScope(bool state)
+    public void SetSniperScope(bool state, Sprite customOverlay = null)
     {
         sniperScope.gameObject.SetActive(state);
+        if (customOverlay)
+            sniperScope.sprite = customOverlay;
     }
 
     public void SetWallgunTooltip(bool state, int cost = 0, bool ammoPurchase = false)
@@ -126,6 +184,39 @@ public class GameUI : MonoBehaviour
         return wallGunTooltip.activeSelf;
     }
 
+    public bool IsGateActive()
+    {
+        return gateTooltip.activeSelf;
+    }
+
+    public bool IsPerkActive()
+    {
+        return perkTooltip.activeSelf;
+    }
+
+    public void SetGateTooltip(bool state, int cost = 1000)
+    {
+        if (state)
+        {
+            string tooltip = string.Format("${0} - Open Gate", cost);
+            gateTooltip.GetComponentInChildren<TextMeshProUGUI>().text = tooltip;
+        }
+        gateTooltip.SetActive(state);
+    }
+    
+    public void SetPerkTooltip(bool state, int cost = 0, string name = null, string description = null)
+    {
+        if (state)
+        {
+            string tooltip = string.Format("${0} - {1}", cost, name);
+
+            TextMeshProUGUI[] perkText = perkTooltip.GetComponentsInChildren<TextMeshProUGUI>();
+            perkText[0].text = tooltip;
+            perkText[1].text = description;
+        }
+        perkTooltip.SetActive(state);
+    }
+
     public void SetReloadTooltip(bool state)
     {
         reloadTooltip.SetActive(state);
@@ -136,21 +227,17 @@ public class GameUI : MonoBehaviour
         WaveCounter.text = string.Format("Round: {0}", wave);
     }
 
-    public void SetEndlessModeTimer(float seconds)
+    public void AddPerk(Sprite perkSprite)
     {
-        string time = "";
-
-        int minutes = (int)seconds / 60;
-        if (minutes > 0)
+        for (int i = 0; i < perks.Length; i++)
         {
-            time = minutes.ToString();
-            seconds = seconds % 60;
-            time += ":"; 
+            if (!perks[i].activeSelf)
+            {
+                perks[i].GetComponent<Image>().sprite = perkSprite;
+                perks[i].SetActive(true);
+                return;
+            }
         }
-
-        time += seconds.ToString("F2");
-
-        WaveCounter.text = time;
     }
 
     #region Game Over Code

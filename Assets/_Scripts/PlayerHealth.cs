@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class PlayerHealth : MonoBehaviour
 {
     public float health = 100;
+    public float maxHealth = 100;
     public bool healthRegeneration = false;
     public int regenRate = 2;
     public float regenCooldown = 5f;
@@ -38,10 +39,10 @@ public class PlayerHealth : MonoBehaviour
     void Update()
     {
         healthSlider.value = health;
-        if (healthRegeneration && regenTimer > regenCooldown && health < 100 && !dead)
+        if (healthRegeneration && regenTimer > regenCooldown && health < maxHealth && !dead)
         {
             health += regenRate * Time.deltaTime;
-            if (health > 100) health = 100;
+            if (health > maxHealth) health = maxHealth;
         }
 
         regenTimer += Time.deltaTime;
@@ -67,6 +68,7 @@ public class PlayerHealth : MonoBehaviour
     {
         dead = true;
         GetComponent<PlayerMovement>().enabled = false;
+        FindObjectOfType<Melee>().enabled = false;
         
         Gun[] guns = FindObjectsOfType<Gun>();
         foreach (Gun gun in guns)
@@ -112,5 +114,10 @@ public class PlayerHealth : MonoBehaviour
         }
 
         playerHurtAudioSource.PlayOneShot(playerHurtSounds[hurtIndex], playerHurtVolume);
+    }
+
+    public Slider getHealthSlider()
+    {
+        return healthSlider;
     }
 }
