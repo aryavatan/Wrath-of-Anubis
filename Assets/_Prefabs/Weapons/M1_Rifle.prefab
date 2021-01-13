@@ -437,8 +437,8 @@ MonoBehaviour:
   accuracy: 40
   automatic: 0
   impactForce: 700
-  reloadTime: 2.3
-  reloadVolume: 0.4
+  reloadTime: 2.7
+  reloadVolume: 1
   clipSize: 10
   maxAmmoCapacity: 110
   cameraShake: {fileID: 11400000, guid: 6fb28af5788819649965b01d24c6146b, type: 2}
@@ -446,8 +446,8 @@ MonoBehaviour:
   horizontalRecoil: 20
   fpsCamera: {fileID: 0}
   EmptyClipAudio: {fileID: 8300000, guid: affcb0fbf92d1e9439aa1f09ba2d28bc, type: 3}
-  ReloadAudio: {fileID: 8300000, guid: 9cc94f5148c6791448b82f9902a6e71d, type: 3}
-  FastReloadAudio: {fileID: 8300000, guid: b0940796a1bfd3c488c43d59843ed192, type: 3}
+  ReloadAudio: {fileID: 8300000, guid: 17304fdebd538e54db3b7c737be9f474, type: 3}
+  FastReloadAudio: {fileID: 8300000, guid: 3f6ba9080e4fdc947a00fa90359dc3ec, type: 3}
   WeaponSwitchAudio: {fileID: 8300000, guid: 8ce8ca35e4269dd469eece8cac09b65d, type: 3}
   MuzzleFlash: {fileID: 8141770591877856224}
   bloodImpactEffect: {fileID: 100002, guid: c09d4cb7aa0a14f4892b9e78372edfce, type: 3}

@@ -28,11 +28,14 @@ public class Melee : MonoBehaviour
     Transform weaponHolder;
 
     GameObject activeGun;
+    PlayerHealth health;
 
     private void Awake()
     {
         meleeAnim = GetComponent<Animator>();
         timer = rateOfFire;
+
+        health = FindObjectOfType<PlayerHealth>();
 
         weaponHolder = transform.GetChild(0).Find("WeaponHolder");
 
@@ -77,6 +80,10 @@ public class Melee : MonoBehaviour
                     FindObjectOfType<GameUI>().CancelReload();
                 }
 
+                SniperScope scope = gun.GetComponent<SniperScope>();
+                if (scope && scope.IsScoped())
+                    return false;
+
                 activeGun = gun.transform.gameObject;
                 gun.WaitForMelee();
             }
@@ -99,6 +106,11 @@ public class Melee : MonoBehaviour
     IEnumerator EnableGun()
     {
         yield return new WaitForSeconds(0.31f);
-        activeGun.GetComponent<Gun>().MeleeFinished();
+
+        if (health.health > 0)
+        {
+            activeGun.GetComponent<Gun>().MeleeFinished();
+        }
+
     }
 }

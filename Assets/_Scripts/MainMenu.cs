@@ -24,6 +24,11 @@ public class MainMenu : MonoBehaviour
     public TextMeshProUGUI fovText;
     public Slider volumeSlider;
     public TextMeshProUGUI volumeText;
+    public Slider lookSensitivitySlider;
+    public TextMeshProUGUI lookText;
+    public TMP_Dropdown resolutionDropdown;
+    public Toggle fullscreenToggle;
+    public Toggle cheatsToggle;
 
     [Header("Controls Objects")]
     public GameObject controlsPanel;
@@ -35,6 +40,7 @@ public class MainMenu : MonoBehaviour
     [Header("Stats Text Objects")]
     public GameObject statsPanel;
     public TextMeshProUGUI roundsText;
+    public TextMeshProUGUI nightmareRoundsText;
     public TextMeshProUGUI killsPerGameText;
     public TextMeshProUGUI totalKillsText;
 
@@ -115,6 +121,8 @@ public class MainMenu : MonoBehaviour
         PlayerStatistics stats = PlayerStatistics.Load();
 
         roundsText.text = string.Format("Highest Round: {0}", stats.highestRound);
+        
+        nightmareRoundsText.text = string.Format("Highest Nightmare Round: {0}", stats.highestNightmareRound);
 
         killsPerGameText.text = string.Format("Most Kills in Game: {0}", stats.highestKillsPerGame);
 
@@ -182,7 +190,21 @@ public class MainMenu : MonoBehaviour
         int targetFPS = PlayerPrefs.GetInt("TargetFPS", 1);
         OnTargetFpsChange(targetFPS);
 
-        
+        // Init Look Sensitivity
+        int lookSen = PlayerPrefs.GetInt("LookSensitivity", 5);
+        OnLookSensitivityChange(lookSen);
+
+        // Init Fullscreen
+        int fullscreen = PlayerPrefs.GetInt("FullscreenOption", 1);
+        ToggleFullscreen(fullscreen == 1 ? true : false);
+
+        // Init Resolution
+        int resolution = PlayerPrefs.GetInt("ResolutionOption", 1);
+        OnResolutionChange(resolution);
+
+        // Init Developer Cheats
+        int cheats = PlayerPrefs.GetInt("DeveloperCheats", 0);
+        ToggleDeveloperCheats(cheats == 0 ? false : true);
     }
 
     public void OnGraphicsChange(int graphics)
@@ -280,6 +302,94 @@ public class MainMenu : MonoBehaviour
         if (state)
             OnTargetFpsChange(1);
         targetFpsDropdown.interactable = !state;
+    }
+
+    public void OnLookSensitivityChange(Single value)
+    {
+        // Update Slider
+        lookSensitivitySlider.value = value;
+        lookText.SetText(value.ToString());
+
+        // Save New Setting
+        PlayerPrefs.SetInt("LookSensitivity", (int)value);
+        PlayerPrefs.Save();
+
+        // Apply New Sensitivity
+        PlayerMovement.mouseSensitivity = (float)value / 5f;
+    }
+
+    public void OnResolutionChange(int res)
+    {
+        // Update Dropdown
+        resolutionDropdown.value = res;
+
+        // Save Setting
+        PlayerPrefs.SetInt("ResolutionOption", res);
+        PlayerPrefs.Save();
+
+        int width, height;
+
+        switch (res)
+        {
+            case 0:
+                width = 2560;
+                height = 1440;
+                break;
+            case 2:
+                width = 1680;
+                height = 1050;
+                break;
+            case 3:
+                width = 1600;
+                height = 900;
+                break;
+            case 4:
+                width = 1440;
+                height = 900;
+                break;
+            case 5:
+                width = 1366;
+                height = 768;
+                break;
+            case 6:
+                width = 1360;
+                height = 768;
+                break;
+            case 7:
+                width = 1280;
+                height = 720;
+                break;
+            case 1:
+            default:
+                width = 1920;
+                height = 1080;
+                break;
+        }
+
+        Screen.SetResolution(width, height, Screen.fullScreen);
+    }
+
+    public void ToggleFullscreen(bool state)
+    {
+        // Update Checkbox
+        fullscreenToggle.isOn = state;
+
+        // Save setting
+        PlayerPrefs.SetInt("FullscreenOption", state ? 1 : 0);
+        PlayerPrefs.Save();
+
+        // Toggle Fullscreen
+        Screen.fullScreen = state;
+    }
+
+    public void ToggleDeveloperCheats(bool state)
+    {
+        // Update Checkbox
+        cheatsToggle.isOn = state;
+
+        // Save the preference
+        PlayerPrefs.SetInt("DeveloperCheats", state == true ? 1 : 0);
+        PlayerPrefs.Save();
     }
 
     #endregion

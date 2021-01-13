@@ -236,11 +236,15 @@ public class WaveManager : MonoBehaviour
     {
         // Load the player statistics
         PlayerStatistics stats = PlayerStatistics.Load();
+        bool cheatsEnabled = PlayerPrefs.GetInt("DeveloperCheats", 0) == 1;
+        bool nightmareMode = PlayerPrefs.GetInt("DifficultyOption", 0) == 1;
 
         // Update the player statistics
-        if (stats.highestRound < roundNumber)
+        if (stats.highestRound < roundNumber && !cheatsEnabled)
             stats.highestRound = roundNumber;
-        if (stats.highestKillsPerGame < playerKills)
+        if (stats.highestNightmareRound < roundNumber && nightmareMode && !cheatsEnabled)
+            stats.highestNightmareRound = roundNumber;
+        if (stats.highestKillsPerGame < playerKills && !cheatsEnabled)
             stats.highestKillsPerGame = playerKills;
         stats.totalKills += playerKills;
 
@@ -354,14 +358,17 @@ public class WaveManager : MonoBehaviour
             {
                 bigboyHealth = 0.9f + (roundNumber / 50f);
                 bigboyDamage = 0.8f + (roundNumber / 25f);
+
+                zombieHealth += (roundNumber / 5) * 0.05f;
+                mummyHealth += (roundNumber / 5) * 0.05f;
             }
             if (roundNumber > 2)
             {
-                zombieHealth = 1f + ((roundNumber - 2) / 10f);
+                zombieHealth += ((roundNumber - 2) / 10f);
                 zombieDamage = 1f + ((roundNumber - 2) / 15f);
                 zombieSpeedIncrease = roundNumber < 6 ? ((roundNumber - 2) / 4f) : 1f;
 
-                mummyHealth = 1f + (roundNumber / 25f);
+                mummyHealth += (roundNumber / 25f);
                 mummyDamage = 1f + (roundNumber / 30f);
             }
         }

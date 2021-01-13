@@ -89,7 +89,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4284002950721688153}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 38bb6f6852982f94a96b6ac53a836508, type: 2}
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
@@ -108,7 +108,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gun: {fileID: 8231138434656489195, guid: 08a334116678da841885d6a7bfd30e13, type: 3}
-  cost: 1000
+  cost: 500
   WeaponHolder: {fileID: 0}
   InsufficientFundsAudio: {fileID: 8300000, guid: 3ead180e42da4a842aca0698d21c39cb,
     type: 3}

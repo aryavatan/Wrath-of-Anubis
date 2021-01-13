@@ -74,6 +74,7 @@ public class PauseMenu : MonoBehaviour
     public void ExitGame()
     {
         Gun.ResetVariables();
+        Powerup.ResetPowerupSpawns();
         FindObjectOfType<WaveManager>().SaveGameStatistics();
         Time.timeScale = 1f;
         AudioListener.pause = false;
@@ -86,6 +87,7 @@ public class PauseMenu : MonoBehaviour
         Time.timeScale = 1f;
         AudioListener.pause = false;
         Gun.ResetVariables();
+        Powerup.ResetPowerupSpawns();
 
         StartCoroutine(LoadLevel(SceneManager.GetActiveScene().buildIndex));
     }
@@ -107,10 +109,10 @@ public class PauseMenu : MonoBehaviour
     public Toggle vsyncToggle;
     public Slider fovSlider;
     public TextMeshProUGUI fovText;
-    public TextMeshProUGUI fovTextGameOver;
     public Slider volumeSlider;
     public TextMeshProUGUI volumeText;
-    public TextMeshProUGUI volumeTextGameOver;
+    public Slider lookSensitivitySlider;
+    public TextMeshProUGUI lookText;
 
     void initOptions()
     {
@@ -134,7 +136,6 @@ public class PauseMenu : MonoBehaviour
             fov = 60;  // default fov value is 60
             fovSlider.value = fov;
             fovText.SetText(fov.ToString());
-            fovTextGameOver.SetText(fov.ToString());
         }
         OnFovChange(fov);
 
@@ -149,6 +150,10 @@ public class PauseMenu : MonoBehaviour
         // Init Target FPS
         int targetFPS = PlayerPrefs.GetInt("TargetFPS", 1);
         OnTargetFpsChange(targetFPS);
+
+        // Init Look Sensitivity
+        int lookSen = PlayerPrefs.GetInt("LookSensitivity", 5);
+        OnLookSensitivityChange(lookSen);
     }
 
     public void OnGraphicsChange(int graphics)
@@ -172,7 +177,6 @@ public class PauseMenu : MonoBehaviour
         // Update UI
         fovSlider.value = value;
         fovText.SetText(value.ToString());
-        fovTextGameOver.SetText(value.ToString());
 
         // Update Camera and other behaviours
         Camera.main.fieldOfView = value;
@@ -189,7 +193,6 @@ public class PauseMenu : MonoBehaviour
         // Update UI
         volumeSlider.value = value;
         volumeText.SetText(value.ToString() + "%");
-        volumeTextGameOver.SetText(value.ToString() + "%");
 
         // Set volume
         AudioListener.volume = (float)value / 100f;
@@ -243,6 +246,20 @@ public class PauseMenu : MonoBehaviour
         if (state)
             OnTargetFpsChange(1);
         targetFpsDropdown.interactable = !state;
+    }
+
+    public void OnLookSensitivityChange(Single value)
+    {
+        // Update Slider
+        lookSensitivitySlider.value = value;
+        lookText.SetText(value.ToString());
+
+        // Save New Setting
+        PlayerPrefs.SetInt("LookSensitivity", (int)value);
+        PlayerPrefs.Save();
+
+        // Apply New Sensitivity
+        PlayerMovement.mouseSensitivity = (float)value / 5f;
     }
 
     #endregion

@@ -118,4 +118,9 @@ public class SniperScope : MonoBehaviour
     {
         defaultFov = value;
     }
+
+    public bool IsScoped()
+    {
+        return isScoped;
+    }
 }

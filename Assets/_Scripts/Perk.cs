@@ -6,6 +6,7 @@ public class Perk : MonoBehaviour
     public int cost;
     public AudioClip powerUpAudio;
     public AudioClip insufficientFundsAudio;
+    public bool perkEnabled = false;
 
     string perkName;
     string perkDescription;
@@ -33,7 +34,7 @@ public class Perk : MonoBehaviour
 
     private void Update()
     {
-        if (playerInRange && Input.GetKeyDown(KeyCode.E))
+        if (playerInRange && Input.GetKeyDown(KeyCode.E) && !perkEnabled)
         {
             PurchasePerk();
         }
@@ -79,15 +80,6 @@ public class Perk : MonoBehaviour
             playerInRange = false;
             ui.SetPerkTooltip(false);
 
-            // Turn off tool tip
-            ui.SetGateTooltip(false);
-
-            // Turn off the trigger box collider
-            GetComponent<BoxCollider>().enabled = false;
-
-            // Trigger Perk Purchase Animation
-            anim.SetTrigger("Purchase");
-
             // Apply the perk to the player
             EnablePerkEffect();
 
@@ -103,10 +95,14 @@ public class Perk : MonoBehaviour
     /// <summary>
     /// This method will enable the respective perk effect(s) for this perk
     /// </summary>
-    void EnablePerkEffect()
+    public void EnablePerkEffect(bool playSound = true)
     {
         FindObjectOfType<PerkManager>().AddPerk(perk, ui);
-        audioSource.PlayOneShot(powerUpAudio);
+
+        if (playSound)
+            audioSource.PlayOneShot(powerUpAudio);
+
+        perkEnabled = true;
 
         switch (perk)
         {
@@ -123,6 +119,12 @@ public class Perk : MonoBehaviour
                 EnableThirdGunPerk();
                 break;
         }
+
+        // Turn off the trigger box collider
+        GetComponent<BoxCollider>().enabled = false;
+
+        // Trigger Perk Purchase Animation
+        anim.SetTrigger("Purchase");
     }
 
     /// <summary>
@@ -169,7 +171,7 @@ public class Perk : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && !perkEnabled)
         {
             playerInRange = true;
             ui.SetPerkTooltip(true, cost, perkName, perkDescription);

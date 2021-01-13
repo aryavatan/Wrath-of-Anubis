@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class PerkManager : MonoBehaviour
@@ -44,7 +45,7 @@ public class PerkManager : MonoBehaviour
     void RandomizePerks()
     {
         // List of all perk locations
-        Perk[] perkLocations = FindObjectsOfType<Perk>();
+        List<Perk> perkLocations = FindObjectsOfType<Perk>().ToList<Perk>();
 
         // List of possible perks
         List<PerkType> perksList = new List<PerkType> {
@@ -54,11 +55,15 @@ public class PerkManager : MonoBehaviour
             PerkType.THIRD_GUN 
         };
 
-        foreach (Perk location in perkLocations)
+        for (int i = 0; i < 4; i++)
         {
-            int i = Random.Range(0, perksList.Count - 1);
-            location.perk = perksList[i];
-            perksList.RemoveAt(i);
+            int locationIndex = Random.Range(0, perkLocations.Count - 1);
+            int perkIndex = Random.Range(0, perksList.Count - 1);
+
+            perkLocations[locationIndex].perk = perksList[perkIndex];
+
+            perkLocations.RemoveAt(locationIndex);
+            perksList.RemoveAt(perkIndex);
         }
     }
 }

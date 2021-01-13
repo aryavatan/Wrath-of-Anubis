@@ -420,6 +420,7 @@ MonoBehaviour:
   pointsOnDeath: 50
   despawnTime: 30
   damageAudioSource: {fileID: 655708420022830573}
+  powerup: {fileID: 7813629133784392844, guid: 94048cd62ff5c4849bfd9820f102e53d, type: 3}
   isDead: 0
 --- !u!195 &655708420022830569
 NavMeshAgent:

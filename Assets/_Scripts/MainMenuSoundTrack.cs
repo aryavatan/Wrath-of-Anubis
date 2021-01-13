@@ -10,13 +10,15 @@ public class MainMenuSoundTrack : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
     }
 
-    private void Update()
+    private void Start()
     {
-        if (!audioSource.isPlaying)
-        {
-            audioSource.clip = loop;
-            audioSource.loop = true;
-            audioSource.Play();
-        }
+        Invoke("BeginSecondLoop", 121);
+    }
+
+    void BeginSecondLoop()
+    {
+        audioSource.clip = loop;
+        audioSource.loop = true;
+        audioSource.Play();
     }
 }

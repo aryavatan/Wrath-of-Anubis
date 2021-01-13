@@ -254,6 +254,7 @@ MonoBehaviour:
   pointsOnDeath: 50
   despawnTime: 30
   damageAudioSource: {fileID: 3923633400690362202}
+  powerup: {fileID: 7813629133784392844, guid: 94048cd62ff5c4849bfd9820f102e53d, type: 3}
   isDead: 0
 --- !u!114 &575835757108954900
 MonoBehaviour:

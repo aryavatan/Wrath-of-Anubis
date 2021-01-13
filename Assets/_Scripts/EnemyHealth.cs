@@ -9,6 +9,8 @@ public class EnemyHealth : MonoBehaviour
     public float despawnTime = 10f;
     public AudioSource damageAudioSource;
 
+    public GameObject powerup;
+
     // Taken off in 1.0 update 
     //public AudioClip hurtSound;
 
@@ -62,6 +64,8 @@ public class EnemyHealth : MonoBehaviour
         FindObjectOfType<GameUI>().AddMoney(pointsOnDeath);
         FindObjectOfType<WaveManager>().AddPlayerKill();
 
+        SpawnPowerup();
+
         this.enabled = false;
     }
 
@@ -85,6 +89,15 @@ public class EnemyHealth : MonoBehaviour
         foreach (Collider collider in colliders)
         {
             collider.enabled = state;
+        }
+    }
+
+    void SpawnPowerup()
+    {
+        if (Powerup.SpawnPowerup())
+        {
+            Vector3 position = new Vector3(transform.position.x, 0.1f, transform.position.z);
+            Instantiate(powerup, position, Quaternion.identity);
         }
     }
 }

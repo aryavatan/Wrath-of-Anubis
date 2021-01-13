@@ -113,7 +113,7 @@ public class Gun : MonoBehaviour
 
         bool automaticFire = automatic && ammoInClip > 0 && Input.GetButton("Fire1");
         bool fire = Input.GetButtonDown("Fire1");
-        bool reloading = reloadTimer < (reloadTime * reloadMultiplier);
+        bool reloading = reloadTimer < ((reloadTime + 0.1f) * reloadMultiplier);
         
         if (timer >= timeBetweenBullets && (fire || automaticFire) && !reloading)
         {
@@ -125,9 +125,10 @@ public class Gun : MonoBehaviour
             }
             else
             {
-                GunshotAudioSource.PlayOneShot(EmptyClipAudio);
                 if (ammoInInventory > 0)
                     Reload();
+                else
+                    GunshotAudioSource.PlayOneShot(EmptyClipAudio);
             }
         }
         else if (!fire && timer >= timeBetweenBullets)
@@ -229,7 +230,7 @@ public class Gun : MonoBehaviour
 
     void Reload()
     {
-        GunshotAudioSource.Stop();
+        //GunshotAudioSource.Stop();
         if (automatic) MuzzleFlash.Stop();
 
         reloadTimer = 0f;

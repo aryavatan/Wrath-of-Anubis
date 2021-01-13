@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-
     //Assingables
     public Transform playerCam;
     public Transform orientation;
@@ -15,6 +14,7 @@ public class PlayerMovement : MonoBehaviour
     private float xRotation;
     private float sensitivity = 50f;
     private float sensMultiplier = 1f;
+    public static float mouseSensitivity = 1f;
 
     //Movement
     public float moveSpeed = 4500f;
@@ -42,6 +42,7 @@ public class PlayerMovement : MonoBehaviour
     private bool readyToJump = true;
     private float jumpCooldown = 0.25f;
     public float jumpForce = 550f;
+    public MilkShake.ShakePreset cameraShake;
 
     //Input
     float x, y;
@@ -158,15 +159,16 @@ public class PlayerMovement : MonoBehaviour
         //Counteract sliding and sloppy movement
         CounterMovement(x, y, mag);
 
-        //If holding jump && ready to jump, then jump
-        if (readyToJump && jumping) Jump();
-
         // When landing jump, play impact sound
         if (inAir && grounded && readyToJump)
         {
             inAir = false;
             jumpAudioSource.Play();
+            Camera.main.GetComponent<MilkShake.Shaker>().Shake(cameraShake);
         }
+
+        //If holding jump && ready to jump, then jump
+        if (readyToJump && jumping) Jump();
 
         //Set max speed
         float maxSpeed = this.maxSpeed * movementMultiplier * debuffMultiplier;
@@ -206,10 +208,13 @@ public class PlayerMovement : MonoBehaviour
 
         // Movement while sliding
         if (grounded && crouching) multiplierV = 0f;
+        if (inAir) multiplierV = 0.2f;
 
-        //Apply forces to move player
-        rb.AddForce(orientation.transform.forward * y * moveSpeed * Time.deltaTime * multiplier * multiplierV);
-        rb.AddForce(orientation.transform.right * x * moveSpeed * Time.deltaTime * multiplier);
+        //Apply forces to move player        
+        Vector3 movementForce = ((orientation.transform.forward * y) + (orientation.transform.right * x)).normalized;
+        movementForce *= moveSpeed * Time.deltaTime * multiplier * multiplierV;
+
+        rb.AddForce(movementForce);
     }
 
     private void Jump()
@@ -244,8 +249,8 @@ public class PlayerMovement : MonoBehaviour
     private float desiredX;
     private void Look()
     {
-        float mouseX = Input.GetAxis("Mouse X") * sensitivity * Time.fixedDeltaTime * sensMultiplier;
-        float mouseY = Input.GetAxis("Mouse Y") * sensitivity * Time.fixedDeltaTime * sensMultiplier;
+        float mouseX = Input.GetAxis("Mouse X") * sensitivity * Time.fixedDeltaTime * sensMultiplier * mouseSensitivity;
+        float mouseY = Input.GetAxis("Mouse Y") * sensitivity * Time.fixedDeltaTime * sensMultiplier * mouseSensitivity;
 
         //Find current look rotation
         Vector3 rot = playerCam.transform.localRotation.eulerAngles;
